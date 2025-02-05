@@ -30,8 +30,8 @@ class Converter:
         self.temp_entry.grid(row=2, padx=10, pady=10)
 
         error = "Please enter a number"
-        self.temp_error = Label(self.temp_frame, text=error, fg="red")
-        self.temp_error.grid(row=3)
+        self.answer_error = Label(self.temp_frame, text=error, fg="blue")
+        self.answer_error.grid(row=3)
 
         # Conversion, help and history / export buttons
         self.button_frame = Frame(self.temp_frame)
@@ -61,21 +61,46 @@ class Converter:
         self.to_history_button = self.button_ref_list[3].config(state=DISABLED)
 
     def check_temp(self, min_temp):
-        print("Min Temp: ", min_temp)
+        """
+        Checks temperature is valid and either 
+        invokes calculation function or shows error message
+        """
 
         # Retrieve the temperature to be converted
         temp_to_convert = self.temp_entry.get()
         print("To convert: ", temp_to_convert)
 
+        # Reset label and entry box
+        self.answer_error.config(fg="blue", font="Arial 13 bold")
+        self.temp_entry.config(bg="white")
+
+        # Check if the temperature is a number and above absolute zero
         try:
             temp_to_convert = float(temp_to_convert)
             if temp_to_convert >= min_temp:
-                self.temp_error.config(text="You are OK")
+                error = ""
+                self.convert(min_temp, temp_to_convert)
             else:
-                self.temp_error.config(text="You are too cold")
-                
+                error = "Too Cold"
+
         except ValueError:
-            self.temp_error.config(text="Please enter a number")
+            error = f"Please enter a number more than / equal to {min_temp}"
+
+        # Display error message if necessary
+        if error != "":
+            self.answer_error.config(text=error, fg="red")
+            self.temp_entry.config(bg="#F4CCCC")
+            self.temp_entry.delete(0, END)
+
+    def convert(self, min_temp, temp_to_convert):
+        """
+        Converts the temperature to the desired unit
+        """
+
+        if min_temp == c.ABS_ZERO_C:
+            self.answer_error.config(text=f"Converting {temp_to_convert}°C to °F")
+        else:
+            self.answer_error.config(text=f"Converting {temp_to_convert}°F to °C")
 
 
 # Main Routine
